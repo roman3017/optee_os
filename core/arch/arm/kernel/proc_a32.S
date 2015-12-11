@@ -58,7 +58,7 @@ _spinlock_loop:
     cmp r1, #0
     wfene
     bne _spinlock_loop
-    dmb
+    /* dmb rb*/
     bx lr
 
 /* int cpu_spin_trylock(lock address) - return 0 on success */
@@ -72,19 +72,19 @@ _trylock_loop:
     strex r0, r2, [r1]
     cmp r0, #0
     bne _trylock_loop
-    dmb
+    /* dmb rb*/
     bx lr
 _trylock_out:
     clrex
-    dmb
+    /* dmb rb*/
     bx lr
 
 /* void cpu_spin_unlock(lock address) - unlock mutex */
 cpu_spin_unlock:
-    dmb
+    /* dmb rb*/
     mov r1, #SPINLOCK_UNLOCK
     str r1, [r0]
-    dsb
+    /* dsb rb*/
     sev
     bx lr
 
@@ -102,10 +102,10 @@ FUNC cpu_mmu_enable , :
 	read_sctlr r0
 	orr	r0, r0, #SCTLR_M
 	write_sctlr r0
-
+/*
 	dsb
 	isb
-
+rb*/
 	bx	lr
 END_FUNC cpu_mmu_enable
 
@@ -119,10 +119,10 @@ FUNC cpu_mmu_enable_icache , :
 	read_sctlr r1
 	orr	r1, r1, #SCTLR_I
 	write_sctlr r1
-
+/*
 	dsb
 	isb
-
+rb*/
 	bx	lr
 END_FUNC cpu_mmu_enable_icache
 
@@ -131,9 +131,9 @@ FUNC cpu_mmu_enable_dcache , :
 	read_sctlr r0
 	orr	r0, r0, #SCTLR_C
 	write_sctlr r0
-
+/*
 	dsb
 	isb
-
+rb*/
 	bx	lr
 END_FUNC cpu_mmu_enable_dcache

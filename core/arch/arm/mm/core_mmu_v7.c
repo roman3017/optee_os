@@ -530,18 +530,18 @@ void core_mmu_set_user_map(struct core_mmu_user_map *map)
 	 * Update the reserved Context ID and TTBR0
 	 */
 
-	dsb();  /* ARM erratum 754322 */
+	//rb dsb();  /* ARM erratum 754322 */
 	write_contextidr(0);
-	isb();
+	//rb isb();
 
 	if (map) {
 		write_ttbr0(map->ttbr0);
-		isb();
+		//rb isb();
 		write_contextidr(map->ctxid);
 	} else {
 		write_ttbr0(read_ttbr1());
 	}
-	isb();
+	//rb isb();
 	core_tlb_maintenance(TLBINV_UNIFIEDTLB, 0);
 
 	/* Restore interrupts */

@@ -72,10 +72,10 @@
 secure_mmu_unifiedtlbinvall:
 
 	write_tlbiallis
-
+/*
 	DSB
 	ISB
-
+rb*/
 	MOV     PC, LR
 
 /*
@@ -92,10 +92,10 @@ secure_mmu_unifiedtlbinvbymva:
 	ORR     R1, R1, R0			/* Combine MVA and ASID */
 
 	MCR     p15, 0, R1, c8, c7, 1		/* Invalidate Unified TLB entry by MVA */
-
+/*
 	DSB
 	ISB
-
+rb*/
 	MOV     PC, LR
 /*
  * void secure_mmu_unifiedtlbinv_curasid(void)
@@ -107,8 +107,10 @@ secure_mmu_unifiedtlbinv_curasid:
 	and     r0, r0, #0xff               /* Get current ASID */
 	/* Invalidate unified TLB by ASID Inner Sharable */
 	write_tlbiasidis r0
+/*
 	dsb
 	isb
+rb*/
 	mov	pc, lr
 
 /*
@@ -120,8 +122,10 @@ secure_mmu_unifiedtlbinv_byasid:
 	and     r0, r0, #0xff               /* Get ASID */
 	/* Invalidate unified TLB by ASID Inner Sharable */
 	write_tlbiasidis r0
+/*
 	dsb
 	isb
+rb*/
 	mov	pc, lr
 
 /*
@@ -131,8 +135,9 @@ arm_cl1_d_cleanbysetway:
 
 	MOV     R0, #0                  @ ; write the Cache Size selection register to be
 	MCR     p15, 2, R0, c0, c0, 0   @ ; sure we address the data cache
+/*
 	ISB                             @ ; ISB to sync the change to the CacheSizeID reg
-
+*/
 	MOV     R0, #0                  @ ; set way number to 0
 _cl_nextWay:
 	MOV     R1, #0                  @ ; set line number (=index) to 0
@@ -145,17 +150,19 @@ _cl_nextLine:
 	ADD     R0, R0, #1 << WAY_FIELD_OFFSET      @ ; increment the way number
 	CMP     R0, #0                              @ ; look for overflow out of way field
 	BNE     _cl_nextWay
-
+/*
 	DSB                             @ ; synchronise
+rb*/
 	MOV PC, LR
 
 arm_cl1_d_invbysetway:
 
 	MOV     R0, #0                  @ ; write the Cache Size selection register to be
 	MCR     p15, 2, R0, c0, c0, 0   @ ; sure we address the data cache
+/*
 	ISB                             @ ; ISB to sync the change to the CacheSizeID reg
-
-_inv_dcache_off:    
+rb*/
+_inv_dcache_off:
 	MOV     R0, #0                  @ ; set way number to 0
 _inv_nextWay:
 	MOV     R1, #0                  @ ; set line number (=index) to 0
@@ -168,16 +175,18 @@ _inv_nextLine:
 	ADD     R0, R0, #1 << WAY_FIELD_OFFSET      @ ; increment the way number
 	CMP     R0, #0                              @ ; look for overflow out of way field
 	BNE     _inv_nextWay
-
+/*
 	DSB                             @ ; synchronise
+rb*/
 	MOV      PC, LR
 
 arm_cl1_d_cleaninvbysetway:
 
 	MOV     R0, #0                  @ ; write the Cache Size selection register to be
 	MCR     p15, 2, R0, c0, c0, 0   @ ; sure we address the data cache
+/*
 	ISB                             @ ; ISB to sync the change to the CacheSizeID reg
-
+rb*/
 	MOV     R0, #0                  @ ; set way number to 0
 _cli_nextWay:
 	MOV     R1, #0                  @ ; set line number (=index) to 0
@@ -190,8 +199,9 @@ _cli_nextLine:
 	ADD     R0, R0, #1 << WAY_FIELD_OFFSET      @ ; increment the way number
 	CMP     R0, #0                              @ ; look for overflow out of way field
 	BNE     _cli_nextWay
-
+/*
 	DSB                             @ ; synchronise
+rb*/
 	MOV PC, LR
 
 /*
@@ -204,8 +214,9 @@ arm_cl1_d_cleanbyva:
 
 	MOV     R2, #0                  @ ; write the Cache Size selection register to be
 	MCR     p15, 2, R2, c0, c0, 0   @ ; sure we address the data cache
+/*
 	ISB                             @ ; ISB to sync the change to the CacheSizeID reg
-
+rb*/
 	BIC     R0, R0, #0x1F           @ ; Mask 5 LSBits
 _cl_area_nextLine:
 	MCR     p15, 0, R0, c7, c10, 1              @ ; Clean data or unified cache line by MVA to PoC
@@ -214,8 +225,9 @@ _cl_area_nextLine:
 	BPL     _cl_area_nextLine
 
 _cl_area_exit:
-	
+/*
 	DSB                             @ ; synchronise
+rb*/
 	MOV PC, LR
 
 /*
@@ -225,11 +237,12 @@ arm_cl1_d_invbyva:
 
 	CMP     R0, R1                      @ ; check that end >= start. Otherwise return.
 	BHI     _inv_area_dcache_exit
-	
+
 	MOV     R2, #0                      @ ; write the Cache Size selection register to be
 	MCR     p15, 2, R2, c0, c0, 0       @ ; sure we address the data cache
+/*
 	ISB                                 @ ; ISB to sync the change to the CacheSizeID reg
-
+rb*/
 _inv_area_dcache_off:
 	BIC     R0, R0, #0x1F                       @ ; Mask 5 LSBits
 _inv_area_dcache_nl:
@@ -239,7 +252,9 @@ _inv_area_dcache_nl:
 	BPL     _inv_area_dcache_nl
 
 _inv_area_dcache_exit:
+/*
 	DSB
+rb*/
 	MOV PC, LR
 
 /*
@@ -252,8 +267,9 @@ arm_cl1_d_cleaninvbyva:
 
 	MOV     R2, #0                  @ ; write the Cache Size selection register to be
 	MCR     p15, 2, R2, c0, c0, 0   @ ; sure we address the data cache
+/*
 	ISB                             @ ; ISB to sync the change to the CacheSizeID reg
-
+rb*/
 	BIC     R0, R0, #0x1F           @ ; Mask 5 LSBits
 _cli_area_nextLine:
 	MCR     p15, 0, R0, c7, c14, 1              @ ; Clean and Invalidate data or unified cache line by MVA to PoC
@@ -262,7 +278,9 @@ _cli_area_nextLine:
 	BPL     _cli_area_nextLine
 
 _cli_area_exit:
+/*
 	DSB                             @ ; synchronise
+rb*/
 	MOV PC, LR
 
 /*
@@ -276,15 +294,16 @@ arm_cl1_i_inv_all:
     /* Invalidate Entire Instruction Cache */
     MOV     R0, #0
     MCR     p15, 0, R0, c7, c5, 0
+/*
     DSB
-
+rb*/
     /* Flush entire branch target cache */
     MOV     R1, #0
     MCR     p15, 0, R1, c7, c5, 6   /* write to Cache operations register */
-
-    DSB                             /* ensure that maintenance operations are seen */
-    ISB                             /* by the instructions rigth after the ISB */
-
+/*
+    DSB                             / ensure that maintenance operations are seen /
+    ISB                             / by the instructions rigth after the ISB /
+rb*/
     BX      LR
 
 /*
@@ -304,13 +323,15 @@ _inv_icache_nextLine:
     ADD     R0, R0, #1 << LINE_FIELD_OFFSET     /* Next cache line */
     CMP     R1, R0
     BPL     _inv_icache_nextLine
+/*
     DSB
-
+*/
     /* Flush entire branch target cache */
     MOV     R1, #0
     MCR     p15, 0, R1, c7, c5, 6   /* write to Cache operations register */
-    DSB                             /* ensure that maintenance operations are seen */
-    ISB                             /* by the instructions rigth after the ISB */
-
+/*
+    DSB                             / ensure that maintenance operations are seen /
+    ISB                             / by the instructions rigth after the ISB /
+rb*/
 _inv_icache_exit:
     BX      LR

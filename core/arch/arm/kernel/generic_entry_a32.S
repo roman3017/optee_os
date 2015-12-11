@@ -77,7 +77,9 @@ LOCAL_FUNC cpu_is_ready , :
 	ldr	r1,=sem_cpu_sync
 	ldr	r2, =SEM_CPU_READY
 	str	r2, [r1, r0]
+/*
 	dsb
+rb*/
 	sev
 	bx	lr
 END_FUNC cpu_is_ready
@@ -132,6 +134,7 @@ END_FUNC wait_secondary
 #endif
 
 LOCAL_FUNC reset , :
+	ldr	lr, =0x8000	/*rb remove from here!!! */
 	mov	r4, r0		/* Save pageable part address */
 	mov	r5, lr		/* Save ns-entry address */
 
@@ -152,8 +155,9 @@ LOCAL_FUNC reset , :
 	bic	r0, r0, #SCTLR_C
 	bic	r0, r0, #SCTLR_I
 	write_sctlr r0
+/*
 	isb
-
+rb*/
 	/* Early ARM secure MP specific configuration */
 	bl	plat_cpu_reset_early
 

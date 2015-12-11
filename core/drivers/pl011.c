@@ -103,8 +103,12 @@ void pl011_init(vaddr_t base, uint32_t uart_clk, uint32_t baud_rate)
 	write32(0, base + UART_CR);
 
 	if (baud_rate) {
-		uint32_t divisor = (uart_clk * 4) / baud_rate;
-
+		uint32_t divisor = 0;
+		uint32_t rem = uart_clk * 4;
+		while(rem >= baud_rate) {
+			divisor++;
+			rem -= baud_rate;
+		}
 		write32(divisor >> 6, base + UART_IBRD);
 		write32(divisor & 0x3f, base + UART_FBRD);
 	}

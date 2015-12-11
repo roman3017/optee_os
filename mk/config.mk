@@ -28,22 +28,22 @@ WARNS ?= 3
 # NOWERROR=1
 
 # Define DEBUG=1 to compile with -g option
-# DEBUG=1
+DEBUG=1
 
 # If 1, debug mode of the tee firmware (CPU restart, Core Status)
-CFG_TEE_CORE_DEBUG ?= 0
+CFG_TEE_CORE_DEBUG ?= 1
 
 # Max level of the tee core traces. 0 means disable, 4 is max.
 # Supported values: 0 (no traces) to 4 (all traces)
 # If CFG_TEE_DRV_DEBUGFS is set, the level of traces to print can be
 # dynamically changes via debugfs in the range 1 => CFG_TEE_CORE_LOG_LEVEL
-CFG_TEE_CORE_LOG_LEVEL ?= 1
+CFG_TEE_CORE_LOG_LEVEL ?= 4
 
 # TA and TEECore log level
 # Supported values: 0 (no traces) to 4 (all traces)
 # If CFG_TEE_DRV_DEBUGFS is set, the level of traces to print can be
 # dynamically changes via debugfs in the range 1 => CFG_TEE_TA_LOG_LEVEL
-CFG_TEE_TA_LOG_LEVEL ?= 1
+CFG_TEE_TA_LOG_LEVEL ?= 4
 
 # TA enablement
 # When defined to "y", TA traces are output according to
