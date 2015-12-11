@@ -1,0 +1,6 @@
+disable_commandline_tags=1
+#kernel_old=1
+kernel=optee.bin
+kernel_address=0xdbd00000
+device_tree=u-boot.bin
+device_tree_address=0x8000

@@ -11,7 +11,7 @@ endif
 platform-cflags += -mcpu=$(platform-cpuarch) -mtune=$(platform-cpuarch)
 platform-cflags += -pipe -mlong-calls
 platform-cflags += -fno-short-enums -mno-apcs-float -fno-common
-platform-cflags += -mfloat-abi=soft
+platform-cflags += -mfpu=vfp -mfloat-abi=hard
 platform-cflags += -mno-unaligned-access
 platform-cflags += -ffunction-sections -fdata-sections
 

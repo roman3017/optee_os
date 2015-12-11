@@ -2,17 +2,17 @@
 
 	.section .text.vfp_asm
 
-/* void vfp_save_extension_regs(uint64_t regs[VFP_NUM_REGS]); */
+/* void vfp_save_extension_regs(uint32_t regs[VFP_NUM_REGS]); */
 FUNC vfp_save_extension_regs , :
-	vstm	r0!, {d0-d15}
-	vstm	r0, {d16-d31}
+	vstm	r0!, {s0-s15}
+	vstm	r0, {s16-s31}
 	bx	lr
 END_FUNC vfp_save_extension_regs
 
-/* void vfp_restore_extension_regs(uint64_t regs[VFP_NUM_REGS]); */
+/* void vfp_restore_extension_regs(uint32_t regs[VFP_NUM_REGS]); */
 FUNC vfp_restore_extension_regs , :
-	vldm	r0!, {d0-d15}
-	vldm	r0, {d16-d31}
+	vldm	r0!, {s0-s15}
+	vldm	r0, {s16-s31}
 	bx	lr
 END_FUNC vfp_restore_extension_regs
 

@@ -26,12 +26,16 @@
  */
 
 #include <platform_config.h>
+
+#include <arm.h>
+#include <assert.h>
 #include <console.h>
 #include <drivers/pl011.h>
 #include <kernel/generic_boot.h>
 #include <kernel/panic.h>
 #include <kernel/pm_stubs.h>
 #include <mm/tee_pager.h>
+#include <sm/sm.h>
 #include <tee/arch_svc.h>
 #include <tee/entry_std.h>
 #include <tee/entry_fast.h>
@@ -81,8 +85,9 @@ static void hexstring(unsigned int d)
     console_putc(0x0A);//\n
     console_flush();
 }
-void plat_cpu_reset_early(void);
-void plat_cpu_reset_early(void)
+
+void plat_cpu_reset_early1(void);
+void plat_cpu_reset_early1(void)
 {
 }
 
@@ -91,7 +96,26 @@ void plat_cpu_reset_late(void)
 {
         hexstring(0xabcde00);
 }
+
+void main_init_gic(void)
+{
+        hexstring(0xabcde01);
 }
+
+#if 0
+void init_sec_mon(uint32_t nsec_entry)
+{
+	struct sm_nsec_ctx *nsec_ctx;
+
+	assert(nsec_entry != (uint32_t)-1);
+
+	/* Initialize secure monitor */
+	nsec_ctx = sm_get_nsec_ctx();
+	nsec_ctx->mon_lr = nsec_entry;
+	nsec_ctx->mon_spsr = CPSR_MODE_SVC | CPSR_I;
+
+}
+#endif
 
 void console_init(void)
 {

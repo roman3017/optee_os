@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, Linaro Limited
+ * Copyright (C) 2015 Freescale Semiconductor, Inc.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,95 +28,73 @@
 #ifndef PLATFORM_CONFIG_H
 #define PLATFORM_CONFIG_H
 
-#define PLATFORM_FLAVOR_ID_rpi	        0
-#define PLATFORM_FLAVOR_ID_cygnus	1
-
+#define PLATFORM_FLAVOR_ID_rpi	0
 #define PLATFORM_FLAVOR_IS(flav) \
-	(PLATFORM_FLAVOR == PLATFORM_FLAVOR_ID_ ## flav)
+	(PLATFORM_FLAVOR_ID_ ## flav == PLATFORM_FLAVOR)
 
-/* Make stacks aligned to data cache line length */
-#define STACK_ALIGNMENT		32
+#define STACK_ALIGNMENT			64
 
 #ifdef CFG_WITH_PAGER
-#error "Pager not supported for platform BCM"
+#error "Pager not supported for platform rpi"
 #endif
 #ifdef CFG_WITH_LPAE
-#error "LPAE not supported for platform BCM"
+#error "LPAE not supported for now"
 #endif
 
-#define HEAP_SIZE		(24 * 1024)
+#if  PLATFORM_FLAVOR_IS(rpi)
+#define UART0_BASE			0x20201000
 
-/*
- * TEE/TZ RAM layout:
- *
- *  +---------------------------------------+ 0xDBC00000
- *  | TEETZ private RAM  |  TEE_RAM         |
- *  |                    +------------------+ 0xDBD00000
- *  |                    |  TA_RAM          |
- *  +---------------------------------------+ 0xDBF00000
- *  |                    |    teecore alloc |
- *  |  TEE/TZ and NSec   |  PUB_RAM   ------|
- *  |   shared memory    |       NSec alloc |
- *  +---------------------------------------+ 0xDC000000
- *
- *  TEE_RAM : 1MByte
- *  PUB_RAM : 1MByte
- *  TA_RAM  : all what is left (at least 2MByte !)
- */
+#define DRAM0_SIZE			0x1C000000
+#define DRAM0_BASE			0xC0000000
 
-#if PLATFORM_FLAVOR_IS(rpi)
+#define CFG_TEE_CORE_NB_CORE		1
 
-#define CFG_TEE_CORE_NB_CORE	1
-#define DRAM0_BASE		0xC0000000
-#define DRAM0_SIZE		0x1C000000
-/* PL011 UART */
-#define UART0_BASE	        0x20201000
-#define CONSOLE_UART_BASE	UART0_BASE
-#define CONSOLE_UART_CLK_IN_HZ	3000000
-#define CONSOLE_BAUDRATE	115200
+#define DDR_SIZE			DRAM0_SIZE
+#define DDR_PHYS_START			DRAM0_BASE
 
-#elif PLATFORM_FLAVOR_IS(cygnus)
+#define CFG_DDR_SIZE			DDR_SIZE
+#define CFG_DDR_START			DDR_PHYS_START
 
-#define CFG_TEE_CORE_NB_CORE	1
-#define DRAM0_BASE		0x60000000
-#define DRAM0_SIZE		0x20000000
-/* 8250 UART */
-#define UART3_BASE	        0x18023000
-#define CONSOLE_UART_BASE	UART3_BASE
-#define CONSOLE_UART_CLK_IN_HZ	100000000
-#define CONSOLE_BAUDRATE	115200
+#define CFG_SHMEM_SIZE			0x100000
+#define CFG_SHMEM_START			(TZDRAM_BASE - CFG_SHMEM_SIZE)
 
 #else
-
 #error "Unknown platform flavor"
-
 #endif
 
-/* define the several memory area sizes */
-#if (CFG_DDR_TEETZ_RESERVED_SIZE < 0x400000)
-#error "Invalid CFG_DDR_TEETZ_RESERVED_SIZE: at least 4MB expected"
-#endif
+#define HEAP_SIZE			(24 * 1024)
 
-#define CFG_SHMEM_SIZE		0x100000
-#define CFG_TEE_RAM_PH_SIZE	0x100000
+/* console uart define */
+#define CONSOLE_UART_BASE		UART0_BASE
+#define CONSOLE_UART_CLK_IN_HZ	        3000000
+#define CONSOLE_BAUDRATE	        115200
 
-#define CFG_TEE_RAM_VA_SIZE	0x100000
+#define TZDRAM_SIZE			(0x00300000)
+#define TZDRAM_BASE			(0xDBD00000)
 
-#define CFG_TA_RAM_SIZE		(CFG_DDR_TEETZ_RESERVED_SIZE - \
-				 CFG_TEE_RAM_PH_SIZE - CFG_SHMEM_SIZE)
-
-/* define the secure memory area */
-#define TZDRAM_BASE		(CFG_DDR_TEETZ_RESERVED_START)
-#define TZDRAM_SIZE		(CFG_TEE_RAM_PH_SIZE + CFG_TA_RAM_SIZE)
-
-/* define the memory areas (TEE_RAM must start at reserved DDR start addr */
-#define CFG_TEE_RAM_START	(TZDRAM_BASE)
-#define CFG_TA_RAM_START	(CFG_TEE_RAM_START + CFG_TEE_RAM_PH_SIZE)
-#define CFG_SHMEM_START		(CFG_TA_RAM_START + CFG_TA_RAM_SIZE)
 
 #ifndef CFG_TEE_LOAD_ADDR
-#define CFG_TEE_LOAD_ADDR	CFG_TEE_RAM_START
+#define CFG_TEE_LOAD_ADDR		TZDRAM_BASE
 #endif
+
+/*
+ * Everything is in TZDRAM.
+ * +------------------+ dc00
+ * |        | TA_RAM  |
+ * + TZDRAM +---------+ dbe0
+ * |        | TEE_RAM |
+ * +--------+---------+ dbd0
+ * | SHMEM            |
+ * +--------+---------+ dbc0
+ */
+
+#define CFG_TEE_RAM_VA_SIZE	(0x00100000)
+#define CFG_TEE_RAM_PH_SIZE	CFG_TEE_RAM_VA_SIZE
+#define CFG_TEE_RAM_START	TZDRAM_BASE
+#define CFG_TA_RAM_SIZE		ROUNDDOWN((TZDRAM_SIZE - CFG_TEE_RAM_VA_SIZE), \
+					  CORE_MMU_DEVICE_SIZE)
+#define CFG_TA_RAM_START	ROUNDUP((TZDRAM_BASE + CFG_TEE_RAM_VA_SIZE), \
+					CORE_MMU_DEVICE_SIZE)
 
 #define DEVICE0_BASE		ROUNDDOWN(CONSOLE_UART_BASE, \
 					  CORE_MMU_DEVICE_SIZE)
