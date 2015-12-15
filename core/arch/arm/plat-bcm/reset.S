@@ -1,4 +1,3 @@
-
 #include <asm.S>
 #include <arm.h>
 #include <arm32_macros.S>
@@ -37,14 +36,15 @@
 	.equ Offset_SVC_Stack, Offset_UND_Stack + Len_UND_Stack
 	.equ Offset_USR_Stack, Offset_SVC_Stack + Len_SVC_Stack
 
-FUNC plat_cpu_reset_early2 , :
+FUNC plat_cpu_reset_early , :
 @	bl CPU_SVC32_MODE
 @	bl Disable_MMU_L1cache
 @	bl Init_aips
 @	bl Init_clock
 @	bl setup_stack
+@	bl Enable_VFP
 	bx	lr
-END_FUNC plat_cpu_reset_early2
+END_FUNC plat_cpu_reset_early
 
 FUNC setup_stack , :
 	ldr r0, =STACK_ADDR
@@ -133,3 +133,20 @@ FUNC Init_clock , :
 	bx lr
 END_FUNC Init_clock
 
+FUNC Enable_VFP , :
+    @ r1 = Access Control Register
+    MRC p15, #0, r1, c1, c0, #2
+    @ enable full access for p10,11
+    ORR r1, r1, #(0xf << 20)
+    @ ccess Control Register = r1
+    MCR p15, #0, r1, c1, c0, #2
+    MOV r1, #0
+    @ flush prefetch buffer because of FMXR below
+    MCR p15, #0, r1, c7, c5, #4
+    @ and CP 10 & 11 were only just enabled
+    @ Enable VFP itself
+    MOV r0,#0x40000000
+    @ FPEXC = r0
+    FMXR FPEXC, r0
+	BX lr
+END_FUNC Enable_VFP

@@ -67,39 +67,27 @@ static void main_fiq(void)
 	panic();
 }
 
-static void hexstring(unsigned int d)
+static void printstr(const char *s)
 {
-    unsigned int rb;
-    unsigned int rc;
-
-    rb=32;
-    while(1)
-    {
-        rb-=4;
-        rc=(d>>rb)&0xF;
-        if(rc>9) rc+=0x37; else rc+=0x30;
-        console_putc(rc);
-        if(rb==0) break;
-    }
-    console_putc(0x0D);//\r
-    console_putc(0x0A);//\n
-    console_flush();
-}
-
-void plat_cpu_reset_early1(void);
-void plat_cpu_reset_early1(void)
-{
+	int i = 0;
+	while(s[i])
+	{
+		if(s[i] == '\n')
+			console_putc('\r');
+		console_putc(s[i]);
+		i++;
+	}
 }
 
 void plat_cpu_reset_late(void);
 void plat_cpu_reset_late(void)
 {
-        hexstring(0xabcde00);
+//        printstr("plat_cpu_reset_late\n");
 }
 
 void main_init_gic(void)
 {
-        hexstring(0xabcde01);
+//        printstr("main_init_gic\n");
 }
 
 #if 0
@@ -113,14 +101,13 @@ void init_sec_mon(uint32_t nsec_entry)
 	nsec_ctx = sm_get_nsec_ctx();
 	nsec_ctx->mon_lr = nsec_entry;
 	nsec_ctx->mon_spsr = CPSR_MODE_SVC | CPSR_I;
-
 }
 #endif
 
 void console_init(void)
 {
-	pl011_init(CONSOLE_UART_BASE, CONSOLE_UART_CLK_IN_HZ, CONSOLE_BAUDRATE);
-	trace_ext_puts("OP-TEE: console_init\r\n");
+//	pl011_init(CONSOLE_UART_BASE, CONSOLE_UART_CLK_IN_HZ, CONSOLE_BAUDRATE);
+	printstr("OP-TEE: console_init\n");
 }
 
 void console_putc(int ch)

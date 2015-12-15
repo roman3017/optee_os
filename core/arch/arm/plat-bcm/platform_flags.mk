@@ -3,12 +3,14 @@ PLATFORM_FLAVOR_$(PLATFORM_FLAVOR) := y
 
 ifeq ($(PLATFORM_FLAVOR),rpi)
 platform-cpuarch = arm1176jzf-s
+platform-arch = armv6zk
 else
 platform-cpuarch = cortex-a9
+platform-arch = armv7-a
 platform-cflags = -mthumb -mthumb-interwork
 endif
 
-platform-cflags += -mcpu=$(platform-cpuarch) -mtune=$(platform-cpuarch)
+platform-cflags += -mcpu=$(platform-cpuarch) -march=$(platform-arch)
 platform-cflags += -pipe -mlong-calls
 platform-cflags += -fno-short-enums -mno-apcs-float -fno-common
 platform-cflags += -mfpu=vfp -mfloat-abi=hard

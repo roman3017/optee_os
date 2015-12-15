@@ -718,18 +718,18 @@ void core_mmu_set_user_map(struct core_mmu_user_map *map)
 	/* Clear ASID */
 	ttbr &= ~((uint64_t)TTBR_ASID_MASK << TTBR_ASID_SHIFT);
 	write_ttbr0_64bit(ttbr);
-	isb();
+//rb	isb();
 
 	/* Set the new map */
 	if (map && map->user_map) {
 		l1_xlation_table[get_core_pos()][user_va_idx] = map->user_map;
-		dsb();	/* Make sure the write above is visible */
+//rb		dsb();	/* Make sure the write above is visible */
 		ttbr |= ((uint64_t)map->asid << TTBR_ASID_SHIFT);
 		write_ttbr0_64bit(ttbr);
-		isb();
+//rb		isb();
 	} else {
 		l1_xlation_table[get_core_pos()][user_va_idx] = 0;
-		dsb();	/* Make sure the write above is visible */
+//rb		dsb();	/* Make sure the write above is visible */
 	}
 
 	core_tlb_maintenance(TLBINV_UNIFIEDTLB, 0);
@@ -791,18 +791,18 @@ void core_mmu_set_user_map(struct core_mmu_user_map *map)
 	/* Clear ASID */
 	ttbr &= ~((uint64_t)TTBR_ASID_MASK << TTBR_ASID_SHIFT);
 	write_ttbr0_el1(ttbr);
-	isb();
+//rb	isb();
 
 	/* Set the new map */
 	if (map && map->user_map) {
 		l1_xlation_table[get_core_pos()][user_va_idx] = map->user_map;
-		dsb();	/* Make sure the write above is visible */
+//rb		dsb();	/* Make sure the write above is visible */
 		ttbr |= ((uint64_t)map->asid << TTBR_ASID_SHIFT);
 		write_ttbr0_el1(ttbr);
-		isb();
+//rb		isb();
 	} else {
 		l1_xlation_table[get_core_pos()][user_va_idx] = 0;
-		dsb();	/* Make sure the write above is visible */
+//rb		dsb();	/* Make sure the write above is visible */
 	}
 
 	core_tlb_maintenance(TLBINV_UNIFIEDTLB, 0);

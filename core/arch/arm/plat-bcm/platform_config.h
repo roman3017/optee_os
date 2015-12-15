@@ -34,18 +34,11 @@
 
 #define STACK_ALIGNMENT			64
 
-#ifdef CFG_WITH_PAGER
-#error "Pager not supported for platform rpi"
-#endif
-#ifdef CFG_WITH_LPAE
-#error "LPAE not supported for now"
-#endif
-
 #if  PLATFORM_FLAVOR_IS(rpi)
 #define UART0_BASE			0x20201000
 
 #define DRAM0_SIZE			0x1C000000
-#define DRAM0_BASE			0xC0000000
+#define DRAM0_BASE			0x00000000
 
 #define CFG_TEE_CORE_NB_CORE		1
 
@@ -70,22 +63,25 @@
 #define CONSOLE_BAUDRATE	        115200
 
 #define TZDRAM_SIZE			(0x00300000)
-#define TZDRAM_BASE			(0xDBD00000)
+#define TZDRAM_BASE			(0x1BD00000)
 
 
 #ifndef CFG_TEE_LOAD_ADDR
-#define CFG_TEE_LOAD_ADDR		TZDRAM_BASE
+#define CFG_TEE_LOAD_ADDR		0x1BD00000
+//#define CFG_TEE_LOAD_ADDR		0x00008000
 #endif
 
 /*
  * Everything is in TZDRAM.
  * +------------------+ dc00
- * |        | TA_RAM  |
+ * |        | TA_RAM  | 2M
  * + TZDRAM +---------+ dbe0
- * |        | TEE_RAM |
+ * |        | TEE_RAM | 1M
  * +--------+---------+ dbd0
- * | SHMEM            |
+ * | SHMEM            | 1M
  * +--------+---------+ dbc0
+ * | LINUX            | 444M
+ * +--------+---------+ c000
  */
 
 #define CFG_TEE_RAM_VA_SIZE	(0x00100000)

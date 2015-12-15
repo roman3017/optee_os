@@ -1,6 +1,7 @@
 export DEBUG=1
 export ARCH=arm
 export CROSS_COMPILE=/local/home/roman/projects/zyboradio/buildroot/output/host/usr/bin/arm-none-linux-gnueabi-
+#export CROSS_COMPILE=arm-none-eabi-
 export CFG_ARM32=y
 export CFG_TEE_CORE_CORE_TARGET=arm1176jzf-s
 export CFG_TEE_CORE_LOG_LEVEL=4
