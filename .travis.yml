@@ -135,5 +135,8 @@ script:
   - PLATFORM=ls  PLATFORM_FLAVOR=ls1021atwr  make -j8 all -s
   - PLATFORM=ls  PLATFORM_FLAVOR=ls1021aqds  make -j8 all -s
 
+  # Broadcom rpi
+  - PLATFORM=bcm  PLATFORM_FLAVOR=rpi make -j8 all -s
+
   # Run regression tests (xtest in QEMU)
   - (cd ${HOME}/optee_repo/build && make -s -j8 check CROSS_COMPILE="ccache arm-linux-gnueabihf-" AARCH32_CROSS_COMPILE=arm-linux-gnueabihf- DUMP_LOGS_ON_ERROR=1)
