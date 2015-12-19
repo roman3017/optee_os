@@ -36,6 +36,11 @@
 	.equ Offset_SVC_Stack, Offset_UND_Stack + Len_UND_Stack
 	.equ Offset_USR_Stack, Offset_SVC_Stack + Len_SVC_Stack
 
+FUNC get_core_pos, :
+    mov r0, #0
+    bx lr
+END_FUNC get_core_pos
+
 FUNC plat_cpu_reset_early , :
 @	bl CPU_SVC32_MODE
 @	bl Disable_MMU_L1cache
@@ -133,6 +138,8 @@ FUNC Init_clock , :
 	bx lr
 END_FUNC Init_clock
 
+#ifdef CFG_WITH_VFP
+
 FUNC Enable_VFP , :
     @ r1 = Access Control Register
     MRC p15, #0, r1, c1, c0, #2
@@ -150,3 +157,5 @@ FUNC Enable_VFP , :
     FMXR FPEXC, r0
 	BX lr
 END_FUNC Enable_VFP
+
+#endif

@@ -1,7 +1,14 @@
+export OPTEES=`pwd`/
+export OPTEEL=/local/home/roman/projects/optee_linuxdriver/
+export OPTEEC=/local/home/roman/projects/optee_client/
+export OPTEET=/local/home/roman/projects/optee_test/
+export BUILDROOT=/local/home/roman/projects/zyboradio/buildroot/
+
+export CROSS_COMPILE=${BUILDROOT}output/host/usr/bin/arm-none-linux-gnueabi-
+#export CROSS_COMPILE=arm-none-eabi-
+
 export DEBUG=1
 export ARCH=arm
-export CROSS_COMPILE=/local/home/roman/projects/zyboradio/buildroot/output/host/usr/bin/arm-none-linux-gnueabi-
-#export CROSS_COMPILE=arm-none-eabi-
 export CFG_ARM32=y
 export CFG_TEE_CORE_CORE_TARGET=arm1176jzf-s
 export CFG_TEE_CORE_LOG_LEVEL=4
@@ -11,28 +18,38 @@ export PLATFORM=bcm-rpi
 make clean
 make
 ${CROSS_COMPILE}objcopy -O binary out/arm-plat-bcm/core/tee.elf optee.bin
+${CROSS_COMPILE}objdump -d binary out/arm-plat-bcm/core/tee.elf > optee.asm
+
+export CROSS_COMPILE=${BUILDROOT}output/host/usr/bin/arm-none-linux-gnueabi-
 
 # make client
-cd /local/home/roman/projects/optee_client/
+cd ${OPTEEC}
 make clean
 make
-cp out/tee-supplicant/tee-supplicant /local/home/roman/projects/zyboradio/buildroot/output/target/root/
-cp out/libteec/libteec.so.1.0 /local/home/roman/projects/zyboradio/buildroot/output/target/lib/
+cp out/tee-supplicant/tee-supplicant ${BUILDROOT}output/target/root/
+cp out/libteec/libteec.so.1.0 ${BUILDROOT}output/target/lib/
 cd -
 
 # make test
-cd /local/home/roman/projects/optee_test/
+cd ${OPTEET}
 export CROSS_COMPILE_HOST=${CROSS_COMPILE}
 export CROSS_COMPILE_TA=${CROSS_COMPILE}
-export TA_DEV_KIT_DIR=/local/home/roman/projects/optee_os/out/arm-plat-bcm/export-user_ta
+export TA_DEV_KIT_DIR=${OPTEES}/out/arm-plat-bcm/export-user_ta
 make clean
 make
-cp out/xtest/xtest /local/home/roman/projects/zyboradio/buildroot/output/target/root/
+rm -rf ${BUILDROOT}output/target/root/ta/
+mkdir -p ${BUILDROOT}output/target/root/ta/
+cp out/xtest/xtest ${BUILDROOT}output/target/root/
+cp out/ta/*/*.ta ${BUILDROOT}output/target/root/ta/
+cd -
+cd ${BUILDROOT}output/target/lib/
+rm optee_armtz
+ln -s ../root/ta optee_armtz
 cd -
 
 #JTAG mux
 ${CROSS_COMPILE}g++ JtagEnabler.cpp -o JtagEnabler
-mv JtagEnabler /local/home/roman/projects/zyboradio/buildroot/output/target/root/
+mv JtagEnabler ${BUILDROOT}output/target/root/
 
 # make kernel
 cd /local/home/roman/projects/zyboradio/buildroot
@@ -40,12 +57,12 @@ make linux-rebuild
 cd -
 
 # make driver
-cd /local/home/roman/projects/zyboradio/buildroot/output/build/linux-4.0.4/
-make M=/home/roman/projects/optee_linuxdriver/
-#${CROSS_COMPILE}objdump -l -x -d /home/roman/projects/optee_linuxdriver/core/optee.ko > /home/roman/projects/optee_linuxdriver/optee.dmp
-#${CROSS_COMPILE}objdump -l -x -d /home/roman/projects/optee_linuxdriver/armtz/optee_armtz.ko > /home/roman/projects/optee_linuxdriver/optee_armtz.dmp
-cp /home/roman/projects/optee_linuxdriver/core/optee.ko ../../target/root/
-cp /home/roman/projects/optee_linuxdriver/armtz/optee_armtz.ko ../../target/root/
+cd ${BUILDROOT}output/build/linux-4.0.4/
+make M=${OPTEEL}
+#${CROSS_COMPILE}objdump -l -x -d ${OPTEEL}core/optee.ko > ${OPTEEL}optee.dmp
+#${CROSS_COMPILE}objdump -l -x -d ${OPTEEL}armtz/optee_armtz.ko > ${OPTEEL}optee_armtz.dmp
+cp ${OPTEEL}core/optee.ko ../../target/root/
+cp ${OPTEEL}armtz/optee_armtz.ko ../../target/root/
 cd -
 
 # make script
@@ -55,7 +72,7 @@ insmod optee_armtz.ko
 ./tee-supplicant &
 EOF
 chmod +x rb
-mv rb /local/home/roman/projects/zyboradio/buildroot/output/target/root/
+mv rb ${BUILDROOT}output/target/root/
 
 # make rootfs
 cd /local/home/roman/projects/zyboradio/buildroot

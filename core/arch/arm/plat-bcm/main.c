@@ -29,8 +29,6 @@
 
 #include <arm.h>
 #include <assert.h>
-#include <console.h>
-#include <drivers/pl011.h>
 #include <kernel/generic_boot.h>
 #include <kernel/panic.h>
 #include <kernel/pm_stubs.h>
@@ -67,18 +65,6 @@ static void main_fiq(void)
 	panic();
 }
 
-static void printstr(const char *s)
-{
-	int i = 0;
-	while(s[i])
-	{
-		if(s[i] == '\n')
-			console_putc('\r');
-		console_putc(s[i]);
-		i++;
-	}
-}
-
 void plat_cpu_reset_late(void);
 void plat_cpu_reset_late(void)
 {
@@ -103,21 +89,3 @@ void init_sec_mon(uint32_t nsec_entry)
 	nsec_ctx->mon_spsr = CPSR_MODE_SVC | CPSR_I;
 }
 #endif
-
-void console_init(void)
-{
-//	pl011_init(CONSOLE_UART_BASE, CONSOLE_UART_CLK_IN_HZ, CONSOLE_BAUDRATE);
-	printstr("OP-TEE: console_init\n");
-}
-
-void console_putc(int ch)
-{
-	if (ch == '\n')
-		pl011_putc('\r', CONSOLE_UART_BASE);
-	pl011_putc(ch, CONSOLE_UART_BASE);
-}
-
-void console_flush(void)
-{
-	pl011_flush(CONSOLE_UART_BASE);
-}
