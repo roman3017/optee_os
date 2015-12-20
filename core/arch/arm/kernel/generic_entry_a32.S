@@ -216,6 +216,9 @@ copy_init:
 	/* Enable Console */
 	bl	console_init
 
+        bl get_mode
+        bl console_dbg
+
 #ifdef CFG_PL310
 	bl	arm_cl2_config
 #endif

@@ -41,6 +41,11 @@ FUNC get_core_pos, :
     bx lr
 END_FUNC get_core_pos
 
+FUNC get_mode, :
+    mrc p15, 0, r0, c1, c1, 0
+    bx lr
+END_FUNC get_mode
+
 FUNC plat_cpu_reset_early , :
 @	bl CPU_SVC32_MODE
 @	bl Disable_MMU_L1cache
