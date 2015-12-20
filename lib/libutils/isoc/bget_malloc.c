@@ -104,16 +104,16 @@
 /* Compiling for TEE Core */
 #include <kernel/mutex.h>
 
-static struct mutex malloc_mu = MUTEX_INITIALIZER;
+//static struct mutex malloc_mu = MUTEX_INITIALIZER;
 
 static void malloc_lock(void)
 {
-	mutex_lock(&malloc_mu);
+//	mutex_lock(&malloc_mu);
 }
 
 static void malloc_unlock(void)
 {
-	mutex_unlock(&malloc_mu);
+//	mutex_unlock(&malloc_mu);
 }
 
 #else /*__KERNEL__*/

@@ -457,7 +457,7 @@
    #error PK requires ASN.1 DER functionality, make sure LTC_DER is enabled
 #endif
 
-#define LTC_OPTEE_THREAD
+//#define LTC_OPTEE_THREAD
 
 /* THREAD management */
 #if defined(LTC_OPTEE_THREAD)

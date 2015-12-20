@@ -16,14 +16,16 @@ $(call force,CFG_SECURE_TIME_SOURCE_CNTPCT,y)
 $(call force,CFG_MMU_V7_TTB,y)
 #$(call force,CFG_BOOT_SYNC_CPU,y)
 #$(call force,CFG_PL310,y)
-#$(call force,CFG_CACHE_API,y)
+$(call force,CFG_CACHE_API,y)
 #$(call force,CFG_GIC,y)
 #$(call force,CFG_HWSUPP_MEM_PERM_PXN,y)
 
 $(call force,CFG_TEE_CORE_DEBUG,y)
 $(call force,CFG_TEE_DEBUG_PANIC,y)
 CFG_TEE_CORE_LOG_LEVEL ?= 4
+CFG_NUM_THREADS ?= 1
 
+CFG_WITH_SOFTWARE_PRNG ?= y
 #CFG_WITH_STACK_CANARIES ?= y
 #CFG_TEE_FS_KEY_MANAGER_TEST ?= y
 #CFG_TEE_CORE_EMBED_INTERNAL_TESTS ?= y

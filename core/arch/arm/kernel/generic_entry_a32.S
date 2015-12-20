@@ -235,7 +235,7 @@ copy_init:
 	ldr	r1, =_end
 #endif
 	sub	r1, r1, #1
-	bl	arm_cl1_d_invbyva
+@@	bl	arm_cl1_d_invbyva
 
 #ifdef CFG_PL310
 	ldr	r0, =__text_start
@@ -252,7 +252,8 @@ copy_init:
 
 	bl	core_init_mmu_map
 	bl	core_init_mmu_regs
-	bl	cpu_mmu_enable
+
+@@	bl	cpu_mmu_enable
 	bl	cpu_mmu_enable_icache
 	bl	cpu_mmu_enable_dcache
 
@@ -276,7 +277,9 @@ copy_init:
 	ldr	r1, =_end
 #endif
 	sub	r1, r1, #1
-	bl	arm_cl1_d_cleaninvbyva
+@@	bl	arm_cl1_d_cleaninvbyva
+
+        bl console_dbg
 
 #ifdef CFG_PL310
 	ldr	r0, =__text_start
@@ -295,6 +298,8 @@ copy_init:
 	bl	arm_cl2_invbyway
 #endif
 
+        bl console_dbg
+
 	bl	wait_secondary
 
 	/*
@@ -303,6 +308,8 @@ copy_init:
 	 * generic_boot.c.
 	 */
 	bl 	thread_clr_boot_thread
+
+        bl console_dbg
 
 #ifdef CFG_TEE_GDB_BOOT
 	/* restore linux boot arguments */

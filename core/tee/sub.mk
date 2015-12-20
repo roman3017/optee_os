@@ -27,6 +27,7 @@ srcs-$(CFG_CRYPTO_PBKDF2) += tee_cryp_pbkdf2.c
 
 srcs-y += tee_fs_common.c
 srcs-y += tee_fs_key_manager.c
+cflags-remove-tee_fs_key_manager.c-y += -pedantic
 srcs-y += tee_fs.c
 
 srcs-y += tee_obj.c
